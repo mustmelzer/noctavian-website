@@ -85,6 +85,17 @@ alter table public.site_projects enable row level security;
 alter table public.site_settings enable row level security;
 alter table public.contact_messages enable row level security;
 
+grant usage on schema public to anon, authenticated;
+grant select on public.site_games to anon, authenticated;
+grant select on public.site_projects to anon, authenticated;
+grant select on public.site_settings to anon, authenticated;
+grant insert on public.contact_messages to anon, authenticated;
+grant select, insert, update, delete on public.site_games to authenticated;
+grant select, insert, update, delete on public.site_projects to authenticated;
+grant select, insert, update, delete on public.site_settings to authenticated;
+grant select, update on public.contact_messages to authenticated;
+grant select on public.admin_profiles to authenticated;
+
 drop policy if exists "Admins can read admin profiles" on public.admin_profiles;
 create policy "Admins can read admin profiles" on public.admin_profiles
 for select to authenticated
