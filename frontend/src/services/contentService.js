@@ -88,9 +88,17 @@ export const loadSiteContent = async () => {
       source: 'supabase',
     };
   } catch (error) {
-    console.warn('Supabase content load failed; using local fallback content.', {
-      error,
-    });
+    console.warn('Supabase content load failed.', { error });
+
+    if (isSupabaseConfigured) {
+      return {
+        games: [],
+        collaborativeProjects: [],
+        contactInfo: fallbackContactInfo,
+        source: 'supabase-error',
+      };
+    }
+
     return {
       games: fallbackGames,
       collaborativeProjects: fallbackProjects,
