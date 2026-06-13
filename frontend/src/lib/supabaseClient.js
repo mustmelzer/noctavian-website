@@ -21,11 +21,11 @@ const setStoredSession = (session) => {
   localStorage.setItem(sessionKey, JSON.stringify(session));
 };
 
-const buildHeaders = ({ auth = false, prefer } = {}) => {
+const buildHeaders = ({ auth = false, prefer, contentType = 'application/json' } = {}) => {
   const headers = {
     apikey: supabaseAnonKey,
-    'Content-Type': 'application/json',
   };
+  if (contentType) headers['Content-Type'] = contentType;
   const session = getStoredSession();
   headers.Authorization = auth && session?.access_token
     ? `Bearer ${session.access_token}`
@@ -52,6 +52,26 @@ const request = async (path, options = {}) => {
 
   if (!response.ok) {
     throw new Error(body?.message || body?.error_description || body?.hint || response.statusText);
+  }
+
+  return body;
+};
+
+const upload = async (path, file) => {
+  const response = await fetch(`${supabaseUrl}${path}`, {
+    method: 'POST',
+    headers: buildHeaders({
+      auth: true,
+      contentType: file.type || 'application/octet-stream',
+    }),
+    body: file,
+  });
+
+  const text = await response.text();
+  const body = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    throw new Error(body?.message || body?.error || response.statusText);
   }
 
   return body;
@@ -89,5 +109,8 @@ export const supabase = {
   },
   rest: {
     request,
+  },
+  storage: {
+    upload,
   },
 };

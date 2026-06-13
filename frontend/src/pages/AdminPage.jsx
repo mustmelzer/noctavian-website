@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Save,
   Trash2,
+  Upload,
 } from 'lucide-react';
 import { categories } from '../data/mockData';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
@@ -17,6 +18,7 @@ import {
   listAdminContent,
   saveContentItem,
   saveSettings,
+  uploadContentImage,
 } from '../services/contentService';
 import { useSiteContent } from '../context/SiteContentContext';
 
@@ -119,11 +121,14 @@ const AdminLogin = ({ onLoggedIn }) => {
 
 const ContentForm = ({ activeTab, item, onCancel, onSaved }) => {
   const [form, setForm] = useState(item || emptyItem);
+  const [imageFile, setImageFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     setForm(item || emptyItem);
+    setImageFile(null);
   }, [item]);
 
   const setValue = (key, value) => {
@@ -144,11 +149,19 @@ const ContentForm = ({ activeTab, item, onCancel, onSaved }) => {
     setError('');
 
     try {
-      await saveContentItem(tableByTab[activeTab], form);
+      let nextForm = form;
+      if (imageFile) {
+        setIsUploading(true);
+        const imageUrl = await uploadContentImage(imageFile, activeTab);
+        nextForm = { ...form, image: imageUrl };
+        setForm(nextForm);
+      }
+      await saveContentItem(tableByTab[activeTab], nextForm);
       onSaved();
     } catch (saveError) {
       setError(saveError.message);
     } finally {
+      setIsUploading(false);
       setIsSaving(false);
     }
   };
@@ -186,9 +199,44 @@ const ContentForm = ({ activeTab, item, onCancel, onSaved }) => {
             <option value="coming-soon">Coming soon</option>
           </select>
         </div>
-        <div>
-          <label className={labelClass}>Image URL</label>
-          <input className={fieldClass} value={form.image} onChange={(event) => setValue('image', event.target.value)} required />
+        <div className="md:col-span-2">
+          <label className={labelClass}>Image</label>
+          <div className="grid gap-3 sm:grid-cols-[96px_1fr]">
+            <div className="h-24 w-24 overflow-hidden rounded-lg border border-slate-700 bg-slate-950">
+              {form.image ? (
+                <img src={form.image} alt={form.title || 'Preview'} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">No image</div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-slate-600 bg-slate-950 px-3 py-3 text-sm text-slate-200 transition hover:border-cyan-400 hover:text-cyan-200">
+                <Upload size={16} />
+                {imageFile ? imageFile.name : 'Upload PNG or JPG'}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    setImageFile(file);
+                    setValue('image', URL.createObjectURL(file));
+                  }}
+                />
+              </label>
+              <input
+                className={fieldClass}
+                value={imageFile ? 'Selected file will be uploaded on save' : form.image}
+                onChange={(event) => {
+                  setImageFile(null);
+                  setValue('image', event.target.value);
+                }}
+                placeholder="Or paste an image URL"
+                required
+              />
+            </div>
+          </div>
         </div>
         <div>
           <label className={labelClass}>Game URL</label>
@@ -228,7 +276,7 @@ const ContentForm = ({ activeTab, item, onCancel, onSaved }) => {
         disabled={isSaving}
       >
         <Save size={18} />
-        {isSaving ? 'Saving...' : 'Save'}
+        {isUploading ? 'Uploading image...' : isSaving ? 'Saving...' : 'Save'}
       </button>
     </form>
   );

@@ -183,3 +183,17 @@ export const submitContactMessage = async (message) => {
     }),
   });
 };
+
+export const uploadContentImage = async (file, folder = 'games') => {
+  if (!file) return null;
+
+  const safeName = file.name
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const extension = safeName.includes('.') ? safeName.split('.').pop() : 'jpg';
+  const path = `${folder}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+
+  await supabase.storage.upload(`/storage/v1/object/site-images/${path}`, file);
+  return `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/site-images/${path}`;
+};

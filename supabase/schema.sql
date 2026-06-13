@@ -61,6 +61,19 @@ create table if not exists public.contact_messages (
   created_at timestamptz not null default now()
 );
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'site-images',
+  'site-images',
+  true,
+  5242880,
+  array['image/png', 'image/jpeg', 'image/webp']
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
 create or replace function public.set_updated_at()
 returns trigger as $$
 begin
@@ -95,6 +108,34 @@ grant select, insert, update, delete on public.site_projects to authenticated;
 grant select, insert, update, delete on public.site_settings to authenticated;
 grant select, update on public.contact_messages to authenticated;
 grant select on public.admin_profiles to authenticated;
+
+create unique index if not exists site_games_unique_title on public.site_games (lower(title));
+create unique index if not exists site_projects_unique_title on public.site_projects (lower(title));
+
+drop policy if exists "Public can read site images" on storage.objects;
+create policy "Public can read site images" on storage.objects
+for select to anon, authenticated
+using (bucket_id = 'site-images');
+
+drop policy if exists "Admins can upload site images" on storage.objects;
+create policy "Admins can upload site images" on storage.objects
+for insert to authenticated
+with check (
+  bucket_id = 'site-images'
+  and exists (select 1 from public.admin_profiles where user_id = auth.uid())
+);
+
+drop policy if exists "Admins can update site images" on storage.objects;
+create policy "Admins can update site images" on storage.objects
+for update to authenticated
+using (
+  bucket_id = 'site-images'
+  and exists (select 1 from public.admin_profiles where user_id = auth.uid())
+)
+with check (
+  bucket_id = 'site-images'
+  and exists (select 1 from public.admin_profiles where user_id = auth.uid())
+);
 
 drop policy if exists "Admins can read admin profiles" on public.admin_profiles;
 create policy "Admins can read admin profiles" on public.admin_profiles
