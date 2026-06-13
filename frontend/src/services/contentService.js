@@ -76,8 +76,8 @@ export const loadSiteContent = async () => {
 
   try {
     const [gamesData, projectsData, settingsData] = await Promise.all([
-      supabase.rest.request('/rest/v1/site_games?select=*&is_visible=eq.true&order=sort_order.asc,created_at.asc'),
-      supabase.rest.request('/rest/v1/site_projects?select=*&is_visible=eq.true&order=sort_order.asc,created_at.asc'),
+      supabase.rest.request('/rest/v1/site_games?select=*&is_visible=is.true&order=sort_order.asc,created_at.asc'),
+      supabase.rest.request('/rest/v1/site_projects?select=*&is_visible=is.true&order=sort_order.asc,created_at.asc'),
       supabase.rest.request('/rest/v1/site_settings?select=key,value'),
     ]);
 
