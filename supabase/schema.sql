@@ -145,7 +145,7 @@ using (user_id = auth.uid());
 drop policy if exists "Public can read visible games" on public.site_games;
 create policy "Public can read visible games" on public.site_games
 for select to anon, authenticated
-using (is_visible = true or exists (select 1 from public.admin_profiles where user_id = auth.uid()));
+using (is_visible = true);
 
 drop policy if exists "Admins can manage games" on public.site_games;
 create policy "Admins can manage games" on public.site_games
@@ -156,7 +156,7 @@ with check (exists (select 1 from public.admin_profiles where user_id = auth.uid
 drop policy if exists "Public can read visible projects" on public.site_projects;
 create policy "Public can read visible projects" on public.site_projects
 for select to anon, authenticated
-using (is_visible = true or exists (select 1 from public.admin_profiles where user_id = auth.uid()));
+using (is_visible = true);
 
 drop policy if exists "Admins can manage projects" on public.site_projects;
 create policy "Admins can manage projects" on public.site_projects

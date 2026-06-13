@@ -71,3 +71,13 @@ with check (
   bucket_id = 'site-images'
   and exists (select 1 from public.admin_profiles where user_id = auth.uid())
 );
+
+drop policy if exists "Public can read visible games" on public.site_games;
+create policy "Public can read visible games" on public.site_games
+for select to anon, authenticated
+using (is_visible = true);
+
+drop policy if exists "Public can read visible projects" on public.site_projects;
+create policy "Public can read visible projects" on public.site_projects
+for select to anon, authenticated
+using (is_visible = true);
