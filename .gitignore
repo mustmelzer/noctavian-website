@@ -1,0 +1,10 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+build/
+dist/
+__pycache__/
+.ruff_cache/
+.DS_Store
+*.zip
