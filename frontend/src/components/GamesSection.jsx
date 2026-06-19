@@ -103,7 +103,7 @@ const GameCard = ({ game, language, onOpenModal }) => {
 
   return (
     <div 
-      className="group cursor-pointer"
+      className="group w-full max-w-xs cursor-pointer sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onOpenModal(game)}
@@ -240,7 +240,7 @@ const GamesSection = () => {
         </div>
 
         {/* Games Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="flex flex-wrap justify-center gap-6">
           {filteredGames.map((game) => (
             <GameCard 
               key={game.id} 

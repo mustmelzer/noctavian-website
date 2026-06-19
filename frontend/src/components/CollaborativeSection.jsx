@@ -89,7 +89,7 @@ const ProjectCard = ({ project, language, onOpenModal }) => {
 
   return (
     <div 
-      className="group cursor-pointer"
+      className="group w-full max-w-xs cursor-pointer sm:w-[calc(50%-12px)]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onOpenModal(project)}
@@ -204,7 +204,7 @@ const CollaborativeSection = () => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        <div className="mx-auto flex max-w-2xl flex-wrap justify-center gap-6">
           {collaborativeProjects.map((project) => (
             <ProjectCard 
               key={project.id} 
