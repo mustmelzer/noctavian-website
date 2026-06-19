@@ -208,8 +208,8 @@ on conflict do nothing;
 insert into public.site_settings (key, value) values
 ('email', 'info@noctavian.com'),
 ('phone', '+90 543 285 57 02'),
-('address', 'Çeltikköy, 3. Sevim Sk. No:15/1, 16000 Osmangazi Bursa, Turkey'),
-('addressTr', 'Çeltikköy, 3. Sevim Sk. No:15/1, 16000 Osmangazi Bursa, Türkiye'),
+('address', 'Yeni Mh. 500. Sk No:11 16940 Mudanya/BURSA'),
+('addressTr', 'Yeni Mh. 500. Sk No:11 16940 Mudanya/BURSA'),
 ('instagram', 'https://www.instagram.com/noctavian.studio/'),
 ('twitter', 'https://x.com/noctavian_stud'),
 ('linkedin', 'https://www.linkedin.com/company/noctavian-studio/')

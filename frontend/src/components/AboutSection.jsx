@@ -88,29 +88,6 @@ const AboutSection = () => {
                   </div>
                 </div>
 
-                {/* Anomal House Section - Inside Card */}
-                <div className="mt-6 pt-6 border-t border-slate-700/50">
-                  <div className="flex flex-col items-center text-center">
-                    <a 
-                      href="https://anomal.house" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="mb-3 hover:opacity-80 transition-opacity"
-                    >
-                      <img 
-                        src="https://customer-assets.emergentagent.com/job_design-clone-55/artifacts/t92kmabm_anomal%20house%20logo%20design_light.png" 
-                        alt="Anomal House"
-                        className="h-10 w-auto"
-                      />
-                    </a>
-                    <p className="text-slate-500 text-xs max-w-xs leading-relaxed">
-                      {language === 'tr' 
-                        ? 'Noctavian Studio, ana yaratıcı ve teknoloji şirketi olan Anomal House bünyesinde faaliyet göstermektedir.'
-                        : 'Noctavian Studio operates under Anomal House, the parent creative and technology company.'
-                      }
-                    </p>
-                  </div>
-                </div>
               </div>
 
               {/* Floating Elements */}

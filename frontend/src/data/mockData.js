@@ -241,8 +241,8 @@ export const services = [
 export const contactInfo = {
   email: "info@noctavian.com",
   phone: "+90 543 285 57 02",
-  address: "Çeltikköy, 3. Sevim Sk. No:15/1, 16000 Osmangazi Bursa, Turkey",
-  addressTr: "Çeltikköy, 3. Sevim Sk. No:15/1, 16000 Osmangazi Bursa, Türkiye",
+  address: "Yeni Mh. 500. Sk No:11 16940 Mudanya/BURSA",
+  addressTr: "Yeni Mh. 500. Sk No:11 16940 Mudanya/BURSA",
   social: {
     instagram: "https://www.instagram.com/noctavian.studio/",
     twitter: "https://x.com/noctavian_stud",
