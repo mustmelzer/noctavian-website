@@ -21,12 +21,69 @@ const setStoredSession = (session) => {
   localStorage.setItem(sessionKey, JSON.stringify(session));
 };
 
-const buildHeaders = ({ auth = false, prefer, contentType = 'application/json' } = {}) => {
+const decodeJwtPayload = (token) => {
+  try {
+    const payload = token.split('.')[1];
+    const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(normalizedPayload));
+  } catch (_error) {
+    return null;
+  }
+};
+
+const isExpired = (session) => {
+  if (!session?.access_token) return true;
+  const payload = decodeJwtPayload(session.access_token);
+  if (!payload?.exp) return false;
+  return payload.exp * 1000 < Date.now() + 30000;
+};
+
+const refreshStoredSession = async () => {
+  const session = getStoredSession();
+  if (!session?.refresh_token) {
+    setStoredSession(null);
+    return null;
+  }
+
+  const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+    method: 'POST',
+    headers: {
+      apikey: supabaseAnonKey,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${supabaseAnonKey}`,
+    },
+    body: JSON.stringify({ refresh_token: session.refresh_token }),
+  });
+
+  const text = await response.text();
+  const body = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    setStoredSession(null);
+    throw new Error(body?.message || body?.error_description || response.statusText);
+  }
+
+  const nextSession = {
+    access_token: body.access_token,
+    refresh_token: body.refresh_token || session.refresh_token,
+    user: body.user || session.user,
+  };
+  setStoredSession(nextSession);
+  return nextSession;
+};
+
+const getValidSession = async () => {
+  const session = getStoredSession();
+  if (!session) return null;
+  if (!isExpired(session)) return session;
+  return refreshStoredSession();
+};
+
+const buildHeaders = (session, { auth = false, prefer, contentType = 'application/json' } = {}) => {
   const headers = {
     apikey: supabaseAnonKey,
   };
   if (contentType) headers['Content-Type'] = contentType;
-  const session = getStoredSession();
   headers.Authorization = auth && session?.access_token
     ? `Bearer ${session.access_token}`
     : `Bearer ${supabaseAnonKey}`;
@@ -39,10 +96,12 @@ const request = async (path, options = {}) => {
     throw new Error('Supabase is not configured.');
   }
 
+  const session = options.auth ? await getValidSession() : null;
+
   const response = await fetch(`${supabaseUrl}${path}`, {
     ...options,
     headers: {
-      ...buildHeaders(options),
+      ...buildHeaders(session, options),
       ...(options.headers || {}),
     },
   });
@@ -58,9 +117,11 @@ const request = async (path, options = {}) => {
 };
 
 const upload = async (path, file) => {
+  const session = await getValidSession();
+
   const response = await fetch(`${supabaseUrl}${path}`, {
     method: 'POST',
-    headers: buildHeaders({
+    headers: buildHeaders(session, {
       auth: true,
       contentType: file.type || 'application/octet-stream',
     }),
@@ -97,7 +158,11 @@ export const supabase = {
       }
     },
     async getSession() {
-      return { data: { session: getStoredSession() }, error: null };
+      try {
+        return { data: { session: await getValidSession() }, error: null };
+      } catch (error) {
+        return { data: { session: null }, error };
+      }
     },
     async signOut() {
       setStoredSession(null);

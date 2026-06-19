@@ -371,7 +371,13 @@ const AdminPage = () => {
       return;
     }
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        supabase.auth.signOut();
+        setSession(null);
+        setIsLoading(false);
+        return;
+      }
       setSession(data.session);
       setIsLoading(false);
     });
@@ -379,7 +385,16 @@ const AdminPage = () => {
 
   useEffect(() => {
     if (!session) return;
-    loadAdminData().catch((loadError) => setError(loadError.message));
+    loadAdminData().catch((loadError) => {
+      if (/jwt|expired|refresh/i.test(loadError.message)) {
+        supabase.auth.signOut();
+        setSession(null);
+        setContent(null);
+        setError('');
+        return;
+      }
+      setError(loadError.message);
+    });
   }, [loadAdminData, session]);
 
   const handleDelete = async (item) => {
