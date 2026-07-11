@@ -91,21 +91,25 @@ const AboutSection = () => {
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-2xl border border-slate-700/40 bg-slate-950/35 px-5 py-4 text-center text-sm text-slate-300">
                   {language === 'tr' ? (
                     <>
-                      <img
-                        src="/flagroom-logo-white.png"
-                        alt="Flagroom Studio"
-                        className="h-7 w-auto max-w-[160px] object-contain"
-                      />
+                      <a href="https://flagroom.studio" target="_blank" rel="noreferrer" aria-label="Flagroom Studio">
+                        <img
+                          src="/flagroom-logo-white.png"
+                          alt="Flagroom Studio"
+                          className="h-7 w-auto max-w-[160px] object-contain transition-opacity hover:opacity-80"
+                        />
+                      </a>
                       <span>yaratıcı girişimidir.</span>
                     </>
                   ) : (
                     <>
                       <span>A creative initiative by</span>
-                      <img
-                        src="/flagroom-logo-white.png"
-                        alt="Flagroom Studio"
-                        className="h-7 w-auto max-w-[160px] object-contain"
-                      />
+                      <a href="https://flagroom.studio" target="_blank" rel="noreferrer" aria-label="Flagroom Studio">
+                        <img
+                          src="/flagroom-logo-white.png"
+                          alt="Flagroom Studio"
+                          className="h-7 w-auto max-w-[160px] object-contain transition-opacity hover:opacity-80"
+                        />
+                      </a>
                     </>
                   )}
                 </div>
